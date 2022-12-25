@@ -39,15 +39,15 @@ typedef enum
 /* Character font size */
 typedef enum
 {
-	WS0010_5x8DOTS,
-	WS0010_5x10DOTS,
+	WS0010_5x8_DOTS,
+	WS0010_5x10_DOTS,
 } ws0010_dots_t;
 
 /* Interface data len */
 typedef enum
 {
-	WS0010_8BITS,
-	WS0010_4BITS,
+	WS0010_8_BITS,
+	WS0010_4_BITS,
 } ws0010_bits_t;
 
 typedef enum
@@ -91,7 +91,7 @@ typedef struct
 	int line_count;
 
 	/* displayed symbols per one line */
-	int symbols_per_line;
+	int displayed_symbols_per_line;
 
 	/* take in account symbols not displayed on screen (for shifting) */
 	int max_symbols_per_line;

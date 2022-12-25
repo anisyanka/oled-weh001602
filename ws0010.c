@@ -99,10 +99,10 @@ static ws0010_ret_t write(ws0010_dev_t *dev, uint8_t byte, int mode)
 		return WS0010_FAIL;
 	}
 
-	if (dev->interface_bits == WS0010_8BITS) {
+	if (dev->interface_bits == WS0010_8_BITS) {
 		dev->ll->set_bits_to_out_pins(byte);
 		pulse_strobe(dev);
-	} else if (dev->interface_bits == WS0010_4BITS) {
+	} else if (dev->interface_bits == WS0010_4_BITS) {
 		dev->ll->set_bits_to_out_pins(byte >> 4);
 		pulse_strobe(dev);
 
@@ -139,9 +139,9 @@ static ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev,
 	uint8_t _alphabet = 0;
 
 	/* data bus length */
-	if (dl == WS0010_8BITS) {
+	if (dl == WS0010_8_BITS) {
 		_dl = (1 << DATA_LEN_POS);
-	} else if (dl == WS0010_4BITS) {
+	} else if (dl == WS0010_4_BITS) {
 		_dl = 0;
 	} else {
 		return WS0010_FAIL;
@@ -157,9 +157,9 @@ static ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev,
 	}
 
 	/* font size */
-	if (font_size == WS0010_5x10DOTS) {
+	if (font_size == WS0010_5x10_DOTS) {
 		_font_size = (1 << FONT_POS);
-	} else if (font_size == WS0010_5x8DOTS) {
+	} else if (font_size == WS0010_5x8_DOTS) {
 		_font_size = 0;
 	} else {
 		return WS0010_FAIL;
