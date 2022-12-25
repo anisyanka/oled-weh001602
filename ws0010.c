@@ -1,8 +1,10 @@
 #include "ws0010.h"
 #include <stdint.h>
+#include <stddef.h>
 
 #define FIRST_LINE_HEAD_ADDR ((uint8_t)0x00)
 #define SECOND_LINE_HEAD_ADDR ((uint8_t)0x40)
+#define LAST_AVAILABLE_ADDR ((uint8_t)(0x7F))
 
 #define CHECK_BUSY_ATTEMPTS 200
 #define DELAY_BETWEEN_CHECKS_US 5000
@@ -15,6 +17,7 @@
 #define DISPLAY_ENTMODESET_CMD ((uint8_t)0x04)
 #define DISPLAY_CONTROL_CMD ((uint8_t)0x08)
 #define DISPLAY_FUNCTIONSET_CMD ((uint8_t)0x20)
+#define DISPLAY_SET_DDRAM_ADDR_CMD ((uint8_t)0x80)
 
 /* display state defines */
 #define DISPLAY_ON_OFF_POS 2
@@ -308,6 +311,31 @@ ws0010_ret_t ws0010_blink_off(ws0010_dev_t *dev)
 	dev->_display_control_state &= ~(1 << BLINKING_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
                 DISPLAY_COMMAND_MODE);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_set_ddram_addr(ws0010_dev_t *dev, uint8_t addr)
+{
+	ws0010_ret_t ret = WS0010_FAIL;
+
+	if (addr > LAST_AVAILABLE_ADDR) {
+		return WS0010_FAIL;
+	}
+
+	ret = write(dev, DISPLAY_SET_DDRAM_ADDR_CMD | addr, DISPLAY_COMMAND_MODE);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_print(ws0010_dev_t *dev, char *str, size_t len)
+{
+	size_t i = 0;
+	ws0010_ret_t ret = WS0010_FAIL;
+
+	for (i = 0; i < len; ++i) {
+		ret |= write(dev, str[i], DISPLAY_DATA_MODE);
+	}
 
 	return ret;
 }

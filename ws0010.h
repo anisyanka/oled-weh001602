@@ -2,6 +2,7 @@
 #define OLED_WS0010_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -133,6 +134,12 @@ ws0010_ret_t ws0010_cursor_on(ws0010_dev_t *dev);
 ws0010_ret_t ws0010_cursor_off(ws0010_dev_t *dev);
 ws0010_ret_t ws0010_blink_on(ws0010_dev_t *dev);
 ws0010_ret_t ws0010_blink_off(ws0010_dev_t *dev);
+
+/* control position to write */
+ws0010_ret_t ws0010_set_ddram_addr(ws0010_dev_t *dev, uint8_t addr);
+
+/* print data */
+ws0010_ret_t ws0010_print(ws0010_dev_t *dev, char *str, size_t len);
 
 #ifdef __cplusplus
 }
