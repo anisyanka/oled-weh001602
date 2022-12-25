@@ -50,6 +50,14 @@ typedef enum
 	WS0010_4BITS,
 } ws0010_bits_t;
 
+typedef enum
+{
+	ENG_JAPAN,
+	WESTERN_EUROPEAN_1,
+	WESTERN_EUROPEAN_2,
+	ENG_RUS,
+} ws0010_alph_t;
+
 /* Low Level functions which must be implemented by user */
 typedef struct
 {
@@ -94,12 +102,16 @@ typedef struct
 	/* interface length */
 	ws0010_bits_t bits;
 
+	/* table of characters */
+	ws0010_alph_t alphabet;
+
 	/* hardware dependent functions */
 	ws0010_ll_t *ll;
 
 	/* internally used variables */
 	uint8_t _entrymode_state;
 	uint8_t _display_control_state;
+	uint8_t _function_set;
 } ws0010_dev_t;
 
 /* Call it before others */
@@ -121,8 +133,6 @@ ws0010_ret_t ws0010_cursor_on(ws0010_dev_t *dev);
 ws0010_ret_t ws0010_cursor_off(ws0010_dev_t *dev);
 ws0010_ret_t ws0010_blink_on(ws0010_dev_t *dev);
 ws0010_ret_t ws0010_blink_off(ws0010_dev_t *dev);
-
-ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev);
 
 #ifdef __cplusplus
 }

@@ -14,11 +14,17 @@
 #define RETURN_HOME_CMD			((uint8_t)0x02)
 #define DISPLAY_ENTMODESET_CMD	((uint8_t)0x04)
 #define DISPLAY_CONTROL_CMD		((uint8_t)0x08)
+#define DISPLAY_FUNCTIONSET_CMD ((uint8_t)0x20)
 
 /* display state defines */
 #define DISPLAY_ON_OFF_POS		2
 #define CURSOR_ON_OFF_POS		1
 #define BLINKING_ON_OFF_POS		0
+
+/* function set defines */
+#define DATA_LEN_POS			4
+#define NUMBER_OF_LINE_POS		3
+#define FONT_POS				2
 
 static void set_pins_to_write_cmd(ws0010_dev_t *dev)
 {
@@ -58,6 +64,10 @@ static int is_args_ok(ws0010_dev_t *dev)
 		!dev->ll->set_bits_to_out_pins || !dev->ll->set_e ||
 		!dev->ll->set_rs || !dev->ll->set_rw) {
 		return 0;	
+	}
+
+	if (dev->line_count > 2 || dev->line_count <= 0) {
+		return 0;
 	}
 
 	return 1;
@@ -206,9 +216,4 @@ ws0010_ret_t ws0010_blink_off(ws0010_dev_t *dev)
 				DISPLAY_COMMAND_MODE);
 
 	return ret;
-}
-
-ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev)
-{
-	return WS0010_OK;
 }
