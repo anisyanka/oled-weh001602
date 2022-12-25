@@ -206,8 +206,8 @@ ws0010_ret_t ws0010_init(ws0010_dev_t *dev)
 
 	/* Display on/off control */
 	dev->_display_control_state = (1 << DISPLAY_ON_OFF_POS) | \
-                                  (1 << CURSOR_ON_OFF_POS) | \
-                                  (1 << BLINKING_ON_OFF_POS);
+                                  (0 << CURSOR_ON_OFF_POS) | \
+                                  (0 << BLINKING_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
                 DISPLAY_COMMAND_MODE);
 	if (ret == WS0010_FAIL) {
