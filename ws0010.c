@@ -13,6 +13,12 @@
 #define CLEAR_DISPLAY_CMD		((uint8_t)0x01)
 #define RETURN_HOME_CMD			((uint8_t)0x02)
 #define DISPLAY_ENTMODESET_CMD	((uint8_t)0x04)
+#define DISPLAY_CONTROL_CMD		((uint8_t)0x08)
+
+/* display state defines */
+#define DISPLAY_ON_OFF_POS		2
+#define CURSOR_ON_OFF_POS		1
+#define BLINKING_ON_OFF_POS		0
 
 static void set_pins_to_write_cmd(ws0010_dev_t *dev)
 {
@@ -132,6 +138,72 @@ ws0010_ret_t ws0010_home(ws0010_dev_t *dev)
 {
 	ws0010_ret_t ret = write(dev, RETURN_HOME_CMD, DISPLAY_COMMAND_MODE);
 	dev->ll->delay_us(2000);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_display_on(ws0010_dev_t *dev)
+{
+	ws0010_ret_t ret = WS0010_FAIL;
+
+	dev->_entrymode_state |= (1 << DISPLAY_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+				DISPLAY_COMMAND_MODE);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_display_off(ws0010_dev_t *dev)
+{
+	ws0010_ret_t ret = WS0010_FAIL;
+
+	dev->_entrymode_state &= ~(1 << DISPLAY_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+				DISPLAY_COMMAND_MODE);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_cursor_on(ws0010_dev_t *dev)
+{
+	ws0010_ret_t ret = WS0010_FAIL;
+
+	dev->_entrymode_state |= (1 << CURSOR_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+				DISPLAY_COMMAND_MODE);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_cursor_off(ws0010_dev_t *dev)
+{
+	ws0010_ret_t ret = WS0010_FAIL;
+
+	dev->_entrymode_state &= ~(1 << CURSOR_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+				DISPLAY_COMMAND_MODE);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_blink_on(ws0010_dev_t *dev)
+{
+	ws0010_ret_t ret = WS0010_FAIL;
+
+	dev->_entrymode_state |= (1 << BLINKING_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+				DISPLAY_COMMAND_MODE);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_blink_off(ws0010_dev_t *dev)
+{
+	ws0010_ret_t ret = WS0010_FAIL;
+
+	dev->_entrymode_state &= ~(1 << BLINKING_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+				DISPLAY_COMMAND_MODE);
 
 	return ret;
 }

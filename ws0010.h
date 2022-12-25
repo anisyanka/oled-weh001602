@@ -97,11 +97,12 @@ typedef struct
 	/* hardware dependent functions */
 	ws0010_ll_t *ll;
 
-	/* internal used variables */
-	int _entrymode_state;
-	
+	/* internally used variables */
+	uint8_t _entrymode_state;
+	uint8_t _display_control_state;
 } ws0010_dev_t;
 
+/* Call it before others */
 ws0010_ret_t ws0010_init(ws0010_dev_t *dev);
 
 /* This is used to clear the Display Write Space 20H in all DDRAM Addresses. */
@@ -113,7 +114,13 @@ ws0010_ret_t ws0010_clear(ws0010_dev_t *dev);
  **/
 ws0010_ret_t ws0010_home(ws0010_dev_t *dev);
 
-
+/* control display state */
+ws0010_ret_t ws0010_display_on(ws0010_dev_t *dev);
+ws0010_ret_t ws0010_display_off(ws0010_dev_t *dev);
+ws0010_ret_t ws0010_cursor_on(ws0010_dev_t *dev);
+ws0010_ret_t ws0010_cursor_off(ws0010_dev_t *dev);
+ws0010_ret_t ws0010_blink_on(ws0010_dev_t *dev);
+ws0010_ret_t ws0010_blink_off(ws0010_dev_t *dev);
 
 ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev);
 
