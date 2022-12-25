@@ -11,6 +11,7 @@
 #define DISPLAY_DATA_MODE		1
 
 #define CLEAR_DISPLAY_CMD		((uint8_t)0x01)
+#define RETURN_HOME_CMD			((uint8_t)0x02)
 
 static void set_pins_to_write_cmd(ws0010_dev_t *dev)
 {
@@ -111,6 +112,14 @@ ws0010_ret_t ws0010_clear(ws0010_dev_t *dev)
 {
 	ws0010_ret_t ret = write(dev, CLEAR_DISPLAY_CMD, DISPLAY_COMMAND_MODE);
 	dev->ll->delay_us(7000);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_home(ws0010_dev_t *dev)
+{
+	ws0010_ret_t ret = write(dev, RETURN_HOME_CMD, DISPLAY_COMMAND_MODE);
+	dev->ll->delay_us(2000);
 
 	return ret;
 }

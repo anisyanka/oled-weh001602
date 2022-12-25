@@ -101,6 +101,7 @@ typedef struct
 
 ws0010_ret_t ws0010_init(ws0010_dev_t *dev);
 ws0010_ret_t ws0010_clear(ws0010_dev_t *dev);
+ws0010_ret_t ws0010_home(ws0010_dev_t *dev);
 ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev);
 
 #ifdef __cplusplus
