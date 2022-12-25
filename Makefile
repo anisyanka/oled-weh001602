@@ -7,8 +7,8 @@ else
 CC = $(PREFIX)gcc
 endif
 
-C_SOURCES =  oled-weh001602.c
-C_INCLUDE_FILES = oled-weh001602.h
+C_SOURCES =  ws0010.c
+C_INCLUDE_FILES = ws0010.h
 CFLAGS = -mcpu=cortex-m3 -mthumb $(C_DEFS) -Wall 
 
 all: $(C_INCLUDE_FILES)

@@ -1,5 +1,5 @@
-#ifndef OLED_WEH001602_H
-#define OLED_WEH001602_H
+#ifndef OLED_WS0010_H
+#define OLED_WS0010_H
 
 #include <stdint.h>
 
@@ -10,9 +10,9 @@ extern "C" {
 /* Any functions of the lib returns one of these values */
 typedef enum
 {
-	OLED_WEH001602_OK,
-	OLED_WEH001602_FAIL,
-} oled_weh001602_ret_t;
+	WS0010_OK,
+	WS0010_FAIL,
+} ws0010_ret_t;
 
 /* Low Level functions which must be implemented by user */
 typedef struct
@@ -34,12 +34,18 @@ typedef struct
 	/* control strobe pin */
 	void (*set_e)(void);
 	void (*reset_e)(void);
-} oled_weh001602_ll_t;
+} ws0010_ll_t;
 
-oled_weh001602_ret_t oled_init(oled_weh001602_ll_t *ll_funcs);
+typedef struct
+{
+	/* data */
+} oled;
+
+
+ws0010_ret_t oled_init(ws0010_ll_t *ll_funcs);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // OLED_WEH001602_H
+#endif  // OLED_WS0010_H
