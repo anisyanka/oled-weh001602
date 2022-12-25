@@ -96,12 +96,25 @@ typedef struct
 
 	/* hardware dependent functions */
 	ws0010_ll_t *ll;
+
+	/* internal used variables */
+	int _entrymode_state;
+	
 } ws0010_dev_t;
 
-
 ws0010_ret_t ws0010_init(ws0010_dev_t *dev);
+
+/* This is used to clear the Display Write Space 20H in all DDRAM Addresses. */
 ws0010_ret_t ws0010_clear(ws0010_dev_t *dev);
+
+/*
+ * Set the DDRAM Address 0 into the Address Counter
+ * and revert the display to its original status (if the display has been shifted).
+ **/
 ws0010_ret_t ws0010_home(ws0010_dev_t *dev);
+
+
+
 ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev);
 
 #ifdef __cplusplus

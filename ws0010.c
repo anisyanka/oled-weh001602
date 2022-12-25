@@ -12,6 +12,7 @@
 
 #define CLEAR_DISPLAY_CMD		((uint8_t)0x01)
 #define RETURN_HOME_CMD			((uint8_t)0x02)
+#define DISPLAY_ENTMODESET_CMD	((uint8_t)0x04)
 
 static void set_pins_to_write_cmd(ws0010_dev_t *dev)
 {
@@ -92,6 +93,17 @@ static ws0010_ret_t write(ws0010_dev_t *dev, uint8_t byte, int mode)
 	}
 
 	return WS0010_OK;
+}
+
+static ws0010_ret_t ws0010_entry_mode_set(ws0010_dev_t *dev,
+										  int inc_bit,
+										  int shift_bit)
+{
+	dev->_entrymode_state = (uint8_t)(inc_bit << 1) | (uint8_t)(shift_bit);
+	ws0010_ret_t ret = write(dev,
+							 DISPLAY_ENTMODESET_CMD | dev->_entrymode_state,
+							 DISPLAY_COMMAND_MODE);
+	return ret;
 }
 
 ws0010_ret_t ws0010_init(ws0010_dev_t *dev)
