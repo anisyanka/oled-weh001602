@@ -43,8 +43,8 @@ static void set_pins_to_write_data(ws0010_dev_t *dev)
 }
 
 /* wait until busy or return fail code: 1 */
-static int is_busy(ws0010_dev_t *dev)
-{
+// static int is_busy(ws0010_dev_t *dev)
+// {
 	// int check_busy_cycles = 0;
 
 	// read DB7
@@ -58,8 +58,8 @@ static int is_busy(ws0010_dev_t *dev)
 	// 	read DB7	
 	// }
 
-	return 0;
-}
+// 	return 0;
+// }
 
 static int is_args_ok(ws0010_dev_t *dev)
 {
