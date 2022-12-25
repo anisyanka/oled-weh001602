@@ -97,10 +97,10 @@ typedef struct
 	int max_symbols_per_line;
 
 	/* dots per characters */
-	ws0010_dots_t dots;
+	ws0010_dots_t font_size;
 
 	/* interface length */
-	ws0010_bits_t bits;
+	ws0010_bits_t interface_bits;
 
 	/* table of characters */
 	ws0010_alph_t alphabet;

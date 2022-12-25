@@ -21,6 +21,10 @@
 #define CURSOR_ON_OFF_POS		1
 #define BLINKING_ON_OFF_POS		0
 
+/* entry mode set defines */
+#define INC_DEC_POS				1
+#define SHIFT_POS				0
+
 /* function set defines */
 #define DATA_LEN_POS			4
 #define NUMBER_OF_LINE_POS		3
@@ -95,10 +99,10 @@ static ws0010_ret_t write(ws0010_dev_t *dev, uint8_t byte, int mode)
 		return WS0010_FAIL;
 	}
 
-	if (dev->bits == WS0010_8BITS) {
+	if (dev->interface_bits == WS0010_8BITS) {
 		dev->ll->set_bits_to_out_pins(byte);
 		pulse_strobe(dev);
-	} else if (dev->bits == WS0010_4BITS) {
+	} else if (dev->interface_bits == WS0010_4BITS) {
 		dev->ll->set_bits_to_out_pins(byte >> 4);
 		pulse_strobe(dev);
 
@@ -115,7 +119,8 @@ static ws0010_ret_t ws0010_entry_mode_set(ws0010_dev_t *dev,
 										  int inc_bit,
 										  int shift_bit)
 {
-	dev->_entrymode_state = (uint8_t)(inc_bit << 1) | (uint8_t)(shift_bit);
+	dev->_entrymode_state = (uint8_t)(inc_bit << INC_DEC_POS) | \
+							(uint8_t)(shift_bit);
 	ws0010_ret_t ret = write(dev,
 							 DISPLAY_ENTMODESET_CMD | dev->_entrymode_state,
 							 DISPLAY_COMMAND_MODE);
@@ -182,6 +187,8 @@ static ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev,
 
 ws0010_ret_t ws0010_init(ws0010_dev_t *dev)
 {
+	ws0010_ret_t ret = 0;
+
 	if (!is_args_ok(dev)) {
 		return WS0010_FAIL;
 	}
@@ -189,7 +196,36 @@ ws0010_ret_t ws0010_init(ws0010_dev_t *dev)
 	/* wait for power stabilization */
 	dev->ll->delay_us(50000);
 
-	// function set
+	/* function set */
+	ret = ws0010_function_set(dev, dev->interface_bits, dev->line_count,
+							  dev->font_size, dev->alphabet);
+	if (ret == WS0010_FAIL) {
+		return WS0010_FAIL;
+	}
+	dev->ll->delay_us(4500);
+
+	/* Display on/off control */
+	dev->_display_control_state = (1 << DISPLAY_ON_OFF_POS) | \
+								  (1 << CURSOR_ON_OFF_POS) | \
+								  (1 << BLINKING_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
+				DISPLAY_COMMAND_MODE);
+	if (ret == WS0010_FAIL) {
+		return WS0010_FAIL;
+	}
+	dev->ll->delay_us(4500);
+
+	/* clear */
+	ret = ws0010_clear(dev);
+	if (ret == WS0010_FAIL) {
+		return WS0010_FAIL;
+	}
+
+	/* entry mode set */
+	ret = ws0010_entry_mode_set(dev, 1, 0);
+	if (ret == WS0010_FAIL) {
+		return WS0010_FAIL;
+	}
 
 	return WS0010_OK;
 }
