@@ -122,6 +122,64 @@ static ws0010_ret_t ws0010_entry_mode_set(ws0010_dev_t *dev,
 	return ret;
 }
 
+static ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev,
+										ws0010_bits_t dl,
+										uint8_t n,
+										ws0010_dots_t font_size,
+										ws0010_alph_t alphabet)
+{
+	uint8_t _dl = 0;
+	uint8_t _n = 0;
+	uint8_t _font_size = 0;
+	uint8_t _alphabet = 0;
+
+	/* data bus length */
+	if (dl == WS0010_8BITS) {
+		_dl = (1 << DATA_LEN_POS);
+	} else if (dl == WS0010_4BITS) {
+		_dl = 0;
+	} else {
+		return WS0010_FAIL;
+	}
+
+	/* lines count */
+	if (n == 2) {
+		_n = (1 << NUMBER_OF_LINE_POS);
+	} else if (n == 1) {
+		_n = 0;
+	} else {
+		return WS0010_FAIL;
+	}
+
+	/* font size */
+	if (font_size == WS0010_5x10DOTS) {
+		_font_size = (1 << FONT_POS);
+	} else if (font_size == WS0010_5x8DOTS) {
+		_font_size = 0;
+	} else {
+		return WS0010_FAIL;
+	}
+
+	/* set alphabet */
+	if (alphabet == ENG_JAPAN) {
+		_alphabet = 0;
+	} else if (alphabet == WESTERN_EUROPEAN_1) {
+		_alphabet = 1;
+	} else if (alphabet == ENG_RUS) {
+		_alphabet = 2;
+	} else if (alphabet == WESTERN_EUROPEAN_2) {
+		_alphabet = 3;
+	} else {
+		return WS0010_FAIL;
+	}
+
+	dev->_function_set = _dl | _n | _font_size | _alphabet;
+	ws0010_ret_t ret = write(dev,
+							 DISPLAY_FUNCTIONSET_CMD | dev->_function_set,
+							 DISPLAY_COMMAND_MODE);
+	return ret;
+}
+
 ws0010_ret_t ws0010_init(ws0010_dev_t *dev)
 {
 	if (!is_args_ok(dev)) {
@@ -156,8 +214,8 @@ ws0010_ret_t ws0010_display_on(ws0010_dev_t *dev)
 {
 	ws0010_ret_t ret = WS0010_FAIL;
 
-	dev->_entrymode_state |= (1 << DISPLAY_ON_OFF_POS);
-	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+	dev->_display_control_state |= (1 << DISPLAY_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
 				DISPLAY_COMMAND_MODE);
 
 	return ret;
@@ -167,8 +225,8 @@ ws0010_ret_t ws0010_display_off(ws0010_dev_t *dev)
 {
 	ws0010_ret_t ret = WS0010_FAIL;
 
-	dev->_entrymode_state &= ~(1 << DISPLAY_ON_OFF_POS);
-	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+	dev->_display_control_state &= ~(1 << DISPLAY_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
 				DISPLAY_COMMAND_MODE);
 
 	return ret;
@@ -178,8 +236,8 @@ ws0010_ret_t ws0010_cursor_on(ws0010_dev_t *dev)
 {
 	ws0010_ret_t ret = WS0010_FAIL;
 
-	dev->_entrymode_state |= (1 << CURSOR_ON_OFF_POS);
-	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+	dev->_display_control_state |= (1 << CURSOR_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
 				DISPLAY_COMMAND_MODE);
 
 	return ret;
@@ -189,8 +247,8 @@ ws0010_ret_t ws0010_cursor_off(ws0010_dev_t *dev)
 {
 	ws0010_ret_t ret = WS0010_FAIL;
 
-	dev->_entrymode_state &= ~(1 << CURSOR_ON_OFF_POS);
-	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+	dev->_display_control_state &= ~(1 << CURSOR_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
 				DISPLAY_COMMAND_MODE);
 
 	return ret;
@@ -200,8 +258,8 @@ ws0010_ret_t ws0010_blink_on(ws0010_dev_t *dev)
 {
 	ws0010_ret_t ret = WS0010_FAIL;
 
-	dev->_entrymode_state |= (1 << BLINKING_ON_OFF_POS);
-	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+	dev->_display_control_state |= (1 << BLINKING_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
 				DISPLAY_COMMAND_MODE);
 
 	return ret;
@@ -211,8 +269,8 @@ ws0010_ret_t ws0010_blink_off(ws0010_dev_t *dev)
 {
 	ws0010_ret_t ret = WS0010_FAIL;
 
-	dev->_entrymode_state &= ~(1 << BLINKING_ON_OFF_POS);
-	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_entrymode_state,
+	dev->_display_control_state &= ~(1 << BLINKING_ON_OFF_POS);
+	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
 				DISPLAY_COMMAND_MODE);
 
 	return ret;
