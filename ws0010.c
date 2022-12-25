@@ -1,34 +1,34 @@
 #include "ws0010.h"
 #include <stdint.h>
 
-#define FIRST_LINE_HEAD_ADDR	((uint8_t)0x00)
-#define SECOND_LINE_HEAD_ADDR	((uint8_t)0x40)
+#define FIRST_LINE_HEAD_ADDR ((uint8_t)0x00)
+#define SECOND_LINE_HEAD_ADDR ((uint8_t)0x40)
 
-#define CHECK_BUSY_ATTEMPTS		200
+#define CHECK_BUSY_ATTEMPTS 200
 #define DELAY_BETWEEN_CHECKS_US 5000
 
-#define DISPLAY_COMMAND_MODE	0
-#define DISPLAY_DATA_MODE		1
+#define DISPLAY_COMMAND_MODE 0
+#define DISPLAY_DATA_MODE 1
 
-#define CLEAR_DISPLAY_CMD		((uint8_t)0x01)
-#define RETURN_HOME_CMD			((uint8_t)0x02)
-#define DISPLAY_ENTMODESET_CMD	((uint8_t)0x04)
-#define DISPLAY_CONTROL_CMD		((uint8_t)0x08)
+#define CLEAR_DISPLAY_CMD ((uint8_t)0x01)
+#define RETURN_HOME_CMD ((uint8_t)0x02)
+#define DISPLAY_ENTMODESET_CMD ((uint8_t)0x04)
+#define DISPLAY_CONTROL_CMD ((uint8_t)0x08)
 #define DISPLAY_FUNCTIONSET_CMD ((uint8_t)0x20)
 
 /* display state defines */
-#define DISPLAY_ON_OFF_POS		2
-#define CURSOR_ON_OFF_POS		1
-#define BLINKING_ON_OFF_POS		0
+#define DISPLAY_ON_OFF_POS 2
+#define CURSOR_ON_OFF_POS 1
+#define BLINKING_ON_OFF_POS 0
 
 /* entry mode set defines */
-#define INC_DEC_POS				1
-#define SHIFT_POS				0
+#define INC_DEC_POS 1
+#define SHIFT_POS 0
 
 /* function set defines */
-#define DATA_LEN_POS			4
-#define NUMBER_OF_LINE_POS		3
-#define FONT_POS				2
+#define DATA_LEN_POS 4
+#define NUMBER_OF_LINE_POS 3
+#define FONT_POS 2
 
 static void set_pins_to_write_cmd(ws0010_dev_t *dev)
 {
@@ -116,22 +116,22 @@ static ws0010_ret_t write(ws0010_dev_t *dev, uint8_t byte, int mode)
 }
 
 static ws0010_ret_t ws0010_entry_mode_set(ws0010_dev_t *dev,
-										  int inc_bit,
-										  int shift_bit)
+                                          int inc_bit,
+                                          int shift_bit)
 {
 	dev->_entrymode_state = (uint8_t)(inc_bit << INC_DEC_POS) | \
-							(uint8_t)(shift_bit);
+                            (uint8_t)(shift_bit);
 	ws0010_ret_t ret = write(dev,
-							 DISPLAY_ENTMODESET_CMD | dev->_entrymode_state,
-							 DISPLAY_COMMAND_MODE);
+                             DISPLAY_ENTMODESET_CMD | dev->_entrymode_state,
+                             DISPLAY_COMMAND_MODE);
 	return ret;
 }
 
 static ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev,
-										ws0010_bits_t dl,
-										uint8_t n,
-										ws0010_dots_t font_size,
-										ws0010_alph_t alphabet)
+                                        ws0010_bits_t dl,
+                                        uint8_t n,
+                                        ws0010_dots_t font_size,
+                                        ws0010_alph_t alphabet)
 {
 	uint8_t _dl = 0;
 	uint8_t _n = 0;
@@ -180,8 +180,8 @@ static ws0010_ret_t ws0010_function_set(ws0010_dev_t *dev,
 
 	dev->_function_set = _dl | _n | _font_size | _alphabet;
 	ws0010_ret_t ret = write(dev,
-							 DISPLAY_FUNCTIONSET_CMD | dev->_function_set,
-							 DISPLAY_COMMAND_MODE);
+                             DISPLAY_FUNCTIONSET_CMD | dev->_function_set,
+                             DISPLAY_COMMAND_MODE);
 	return ret;
 }
 
@@ -198,7 +198,7 @@ ws0010_ret_t ws0010_init(ws0010_dev_t *dev)
 
 	/* function set */
 	ret = ws0010_function_set(dev, dev->interface_bits, dev->line_count,
-							  dev->font_size, dev->alphabet);
+                              dev->font_size, dev->alphabet);
 	if (ret == WS0010_FAIL) {
 		return WS0010_FAIL;
 	}
@@ -206,10 +206,10 @@ ws0010_ret_t ws0010_init(ws0010_dev_t *dev)
 
 	/* Display on/off control */
 	dev->_display_control_state = (1 << DISPLAY_ON_OFF_POS) | \
-								  (1 << CURSOR_ON_OFF_POS) | \
-								  (1 << BLINKING_ON_OFF_POS);
+                                  (1 << CURSOR_ON_OFF_POS) | \
+                                  (1 << BLINKING_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
-				DISPLAY_COMMAND_MODE);
+                DISPLAY_COMMAND_MODE);
 	if (ret == WS0010_FAIL) {
 		return WS0010_FAIL;
 	}
@@ -252,7 +252,7 @@ ws0010_ret_t ws0010_display_on(ws0010_dev_t *dev)
 
 	dev->_display_control_state |= (1 << DISPLAY_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
-				DISPLAY_COMMAND_MODE);
+                DISPLAY_COMMAND_MODE);
 
 	return ret;
 }
@@ -263,7 +263,7 @@ ws0010_ret_t ws0010_display_off(ws0010_dev_t *dev)
 
 	dev->_display_control_state &= ~(1 << DISPLAY_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
-				DISPLAY_COMMAND_MODE);
+                DISPLAY_COMMAND_MODE);
 
 	return ret;
 }
@@ -274,7 +274,7 @@ ws0010_ret_t ws0010_cursor_on(ws0010_dev_t *dev)
 
 	dev->_display_control_state |= (1 << CURSOR_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
-				DISPLAY_COMMAND_MODE);
+                DISPLAY_COMMAND_MODE);
 
 	return ret;
 }
@@ -285,7 +285,7 @@ ws0010_ret_t ws0010_cursor_off(ws0010_dev_t *dev)
 
 	dev->_display_control_state &= ~(1 << CURSOR_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
-				DISPLAY_COMMAND_MODE);
+                DISPLAY_COMMAND_MODE);
 
 	return ret;
 }
@@ -296,7 +296,7 @@ ws0010_ret_t ws0010_blink_on(ws0010_dev_t *dev)
 
 	dev->_display_control_state |= (1 << BLINKING_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
-				DISPLAY_COMMAND_MODE);
+                DISPLAY_COMMAND_MODE);
 
 	return ret;
 }
@@ -307,7 +307,7 @@ ws0010_ret_t ws0010_blink_off(ws0010_dev_t *dev)
 
 	dev->_display_control_state &= ~(1 << BLINKING_ON_OFF_POS);
 	ret = write(dev, DISPLAY_CONTROL_CMD | dev->_display_control_state,
-				DISPLAY_COMMAND_MODE);
+                DISPLAY_COMMAND_MODE);
 
 	return ret;
 }
