@@ -33,6 +33,33 @@
 #define NUMBER_OF_LINE_POS 3
 #define FONT_POS 2
 
+#define UPPER_E_RUS_IN_FONT_TABLE ((uint8_t)0xa2) /* Ё in table */
+#define UPPER_E_RUS_UNICODE_LOW ((uint8_t)0x81) /* Ё in unicode */
+#define LOWER_e_RUS_IN_FONT_TABLE ((uint8_t)0xb5) /* ё in table */
+#define LOWER_e_RUS_UNICODE_LOW ((uint8_t)0x91) /* ё in unicode */
+
+/* See RUS-ENG table in ws0010 datasheet */
+static const char russian_alphabet[]=
+{
+	/* Upper case */
+	0x41 /* A */, 0xa0 /* Б */, 0x42 /* В */, 0xa1 /* Г */, 0xe0 /* Д */,
+	0x45 /* Е */, 0xa3 /* Ж */, 0xa4 /* З */, 0xa5 /* И */, 0xa6 /* Й */,
+	0x4b /* K */, 0xa7 /* Л */, 0x4d /* M */, 0x48 /* H */, 0x4f /* O */,
+	0xa8 /* П */, 0x50 /* P */, 0x43 /* C */, 0x54 /* T */, 0xa9 /* У */,
+	0xaa /* Ф */, 0x58 /* Х */, 0xe1 /* Ц */, 0xab /* Ч */, 0xac /* Ш */,
+	0xe2 /* Щ */, 0xad /* Ъ */, 0xae /* Ы */, 0xc4 /* ь */, 0xaf /* Э */,
+	0xb0 /* Ю */, 0xb1 /* Я */,
+
+	/* Lower case */
+	0x61 /* a */, 0xb2 /* б */, 0xb3 /* в */, 0xb4 /* г */, 0xe3 /* д */, 
+	0x65 /* e */, 0xb6 /* ж */, 0xb7 /* з */, 0xb8 /* и */, 0xb9 /* й */,
+	0xba /* к */, 0xbb /* л */, 0xbc /* м */, 0xbd /* н */, 0x6f /* o */,
+	0xbe /* п */, 0x70 /* р */, 0x63 /* с */, 0xbf /* т */, 0x79 /* у */,
+	0xe4 /* ф */, 0x78 /* х */, 0xe5 /* ц */, 0xc0 /* ч */, 0xc1 /* ш */,
+	0xe6 /* у */, 0xc2 /* ъ */, 0xc3 /* ы */, 0xc4 /* ь */, 0xc5 /* э */,
+	0xc6 /* ю */, 0xc7 /* я */,
+};
+
 static void set_pins_to_write_cmd(ws0010_dev_t *dev)
 {
 	dev->ll->reset_rs();
@@ -330,11 +357,48 @@ ws0010_ret_t ws0010_set_ddram_addr(ws0010_dev_t *dev, uint8_t addr)
 
 ws0010_ret_t ws0010_print(ws0010_dev_t *dev, char *str, size_t len)
 {
-	size_t i = 0;
 	ws0010_ret_t ret = WS0010_FAIL;
+	int is_unicode_symbol = 0;
+	int is_d0 = 0;
+	int is_d1 = 0;
+	uint8_t symbol = 0;
 
-	for (i = 0; i < len; ++i) {
-		ret |= write(dev, str[i], DISPLAY_DATA_MODE);
+	for (size_t i = 0; i < len; ++i) {
+		if ((str[i] == 0xd0) && (!is_unicode_symbol)) { /* Russian language UTF-8 start upper case */
+			is_unicode_symbol = 1;
+			is_d0 = 1;
+			continue;
+		} else if ((str[i] == 0xd1) && (!is_unicode_symbol)) { /* Russian language UTF-8 start lower case */
+			is_unicode_symbol = 1;
+			is_d1 = 1;
+			continue;
+		}
+
+		if (is_unicode_symbol) {
+			is_unicode_symbol = 0;
+
+			if (is_d0) {
+				is_d0 = 0;
+
+				if (str[i] == UPPER_E_RUS_UNICODE_LOW){
+					symbol = UPPER_E_RUS_IN_FONT_TABLE;
+				} else {
+					symbol = russian_alphabet[str[i] - 0x90];
+				}
+			} else if (is_d1) {
+				is_d1 = 0;
+
+				if (str[i] == LOWER_e_RUS_UNICODE_LOW) {
+					symbol = LOWER_e_RUS_IN_FONT_TABLE;
+				} else {
+					symbol = russian_alphabet[0x30 + str[i] - 0x80];
+				}
+			}
+		} else {
+			symbol = str[i];
+		}
+
+		ret |= write(dev, symbol, DISPLAY_DATA_MODE);
 	}
 
 	return ret;
