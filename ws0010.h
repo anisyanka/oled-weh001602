@@ -113,6 +113,7 @@ typedef struct
 	uint8_t _entrymode_state;
 	uint8_t _display_control_state;
 	uint8_t _function_set;
+	uint8_t _cursor_disp_shift;
 } ws0010_dev_t;
 
 /* Call it before others */
@@ -140,6 +141,10 @@ ws0010_ret_t ws0010_set_ddram_addr(ws0010_dev_t *dev, uint8_t addr);
 
 /* print data */
 ws0010_ret_t ws0010_print(ws0010_dev_t *dev, char *str, size_t len);
+
+/* Shift all symbols */
+ws0010_ret_t ws0010_scroll_display_right(ws0010_dev_t *dev);
+ws0010_ret_t ws0010_scroll_display_left(ws0010_dev_t *dev);
 
 #ifdef __cplusplus
 }

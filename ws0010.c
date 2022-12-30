@@ -16,6 +16,7 @@
 #define RETURN_HOME_CMD ((uint8_t)0x02)
 #define DISPLAY_ENTMODESET_CMD ((uint8_t)0x04)
 #define DISPLAY_CONTROL_CMD ((uint8_t)0x08)
+#define DISPLAY_CURSOR_SHIFT ((uint8_t)0x10)
 #define DISPLAY_FUNCTIONSET_CMD ((uint8_t)0x20)
 #define DISPLAY_SET_DDRAM_ADDR_CMD ((uint8_t)0x80)
 
@@ -32,6 +33,10 @@
 #define DATA_LEN_POS 4
 #define NUMBER_OF_LINE_POS 3
 #define FONT_POS 2
+
+/* cursor shift defines */
+#define CURSOR_SHIFT_POS 3
+#define ENTIRE_DISP_SHIFT_POS 2
 
 #define UPPER_E_RUS_IN_FONT_TABLE ((uint8_t)0xa2) /* Ё in table */
 #define UPPER_E_RUS_UNICODE_LOW ((uint8_t)0x81) /* Ё in unicode */
@@ -223,6 +228,11 @@ ws0010_ret_t ws0010_init(ws0010_dev_t *dev)
 		return WS0010_FAIL;
 	}
 
+	dev->_entrymode_state = 0;
+	dev->_display_control_state = 0;
+	dev->_function_set = 0;
+	dev->_cursor_disp_shift = 0;
+
 	/* wait for power stabilization */
 	dev->ll->delay_us(50000);
 
@@ -400,6 +410,28 @@ ws0010_ret_t ws0010_print(ws0010_dev_t *dev, char *str, size_t len)
 
 		ret |= write(dev, symbol, DISPLAY_DATA_MODE);
 	}
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_scroll_display_right(ws0010_dev_t *dev)
+{
+	dev->_cursor_disp_shift |= (1 << CURSOR_SHIFT_POS) | \
+							   (1 << ENTIRE_DISP_SHIFT_POS);
+	ws0010_ret_t ret = write(dev, DISPLAY_CURSOR_SHIFT | dev->_cursor_disp_shift,
+							 DISPLAY_COMMAND_MODE);
+
+	return ret;
+}
+
+ws0010_ret_t ws0010_scroll_display_left(ws0010_dev_t *dev)
+{
+	dev->_cursor_disp_shift &= ~(1 << ENTIRE_DISP_SHIFT_POS);
+	dev->_cursor_disp_shift |= (1 << CURSOR_SHIFT_POS);
+
+	ws0010_ret_t ret = write(dev,
+							 DISPLAY_CURSOR_SHIFT | dev->_cursor_disp_shift,
+							 DISPLAY_COMMAND_MODE);
 
 	return ret;
 }
